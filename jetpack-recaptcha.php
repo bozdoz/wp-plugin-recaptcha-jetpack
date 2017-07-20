@@ -28,6 +28,8 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
 
         public static $title = 'Jetpack reCAPTCHA';
         public static $slug = 'jetpack-recaptcha';
+        // $error holds an error msg if POST method fails
+        public static $error = '';
 
         /*
         *
@@ -67,7 +69,14 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
             if (!$site_key) {
                 return '<div>No Site Key Found! Please Set this value in Jetpack reCAPTCHA plugin!</div>';
             }
-            return "<div class=\"g-recaptcha\" data-sitekey=\"${site_key}\"></div>";
+
+            $button = "<div class=\"g-recaptcha\" data-sitekey=\"${site_key}\"></div>";
+
+            if (self::failed) {
+                $button = "<div class=\"error\">${self::$error}</div>";
+            }
+
+            return $button;
         }
 
         /*
@@ -81,6 +90,9 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
         */
 
         function google_verify ($default) {
+            // reset error
+            self::$error = '';
+            
             $secret_key = get_option('bozdoz_jpr_secret_key');
 
             // if we can't make the request, return default
@@ -95,7 +107,8 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
             $response = json_decode($response);
 
             if (!$response->success) {
-                return new WP_Error('spam', 'Google could not verify you; please try again.');
+                self::$error = 'Google could not verify you; please try again.';
+                return new WP_Error('spam', self::$error);
             }
 
             return $default;
