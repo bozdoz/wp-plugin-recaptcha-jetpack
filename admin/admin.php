@@ -38,7 +38,11 @@ if (isset($_POST['submit'])) {
 	<?php
 	function option_label ($opt) {
 	    $opt = explode('_', $opt);
+
+	    // remove both prefixes
 	    array_shift($opt);
+	    array_shift($opt);
+	    
 	    foreach($opt as &$v) {
 	        $v = ucfirst($v);
 	    }
