@@ -94,10 +94,8 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
             $response = self::get_url($url, $querystring);
             $response = json_decode($response);
 
-            var_dump($response);
-
             if (!$response->success) {
-                $default = true;
+                return new WP_Error('spam', 'Google could not verify you; please try again.');
             }
 
             return $default;
