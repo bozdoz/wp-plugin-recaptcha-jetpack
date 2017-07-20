@@ -70,10 +70,10 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
                 return '<div>No Site Key Found! Please Set this value in Jetpack reCAPTCHA plugin!</div>';
             }
 
-            $button = "<div class=\"g-recaptcha\" data-sitekey=\"${site_key}\"></div>";
+            $button = sprintf("<div class=\"g-recaptcha\" data-sitekey=\"%s\"></div>", $site_key);
 
             if (self::$error) {
-                $button = "<div class=\"error\">${self::$error}</div>";
+                return sprintf("<div class=\"error\">%s</div> %s", self::$error, $button);
             }
 
             return $button;
