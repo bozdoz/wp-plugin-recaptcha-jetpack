@@ -72,7 +72,7 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
 
             $button = "<div class=\"g-recaptcha\" data-sitekey=\"${site_key}\"></div>";
 
-            if (self::failed) {
+            if (self::$error) {
                 $button = "<div class=\"error\">${self::$error}</div>";
             }
 
@@ -92,7 +92,7 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
         function google_verify ($default) {
             // reset error
             self::$error = '';
-            
+
             $secret_key = get_option('bozdoz_jpr_secret_key');
 
             // if we can't make the request, return default
