@@ -1,7 +1,7 @@
-=== Jetpack Recaptcha ===
+=== Jetpack reCAPTCHA ===
 Author: bozdoz
 Author URI: https://www.twitter.com/bozdoz/
-Plugin URI: https://wordpress.org/plugins/jetpack-recaptcha/
+Plugin URI: https://github.com/bozdoz/wp-plugin-jetpack-recaptcha
 Contributors: bozdoz
 Donate link: https://www.gittip.com/bozdoz/
 Tags: jetpack, google, recaptcha, captcha, contact

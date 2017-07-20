@@ -1,25 +1,25 @@
 <?php
     /*
-    Plugin Name: Jetpack Recaptcha
-    Plugin URI: https://wordpress.org/plugins/jetpack-recaptcha/
+    Plugin Name: Jetpack reCAPTCHA
+    Plugin URI: https://github.com/bozdoz/wp-plugin-jetpack-recaptcha
     Description: A simple plugin that adds a Google reCAPTCHA to the Jetpack contact form. Requires the Jetpack plugin.
     Author: bozdoz
     Author URI: https://twitter.com/bozdoz/
     Version: 0.1.0
     License: GPL2
 
-    Jetpack Recaptcha is free software: you can redistribute it and/or modify
+    Jetpack reCAPTCHA is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 2 of the License, or
     any later version.
      
-    Jetpack Recaptcha is distributed in the hope that it will be useful,
+    Jetpack reCAPTCHA is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
      
     You should have received a copy of the GNU General Public License
-    along with Jetpack Recaptcha.
+    along with Jetpack reCAPTCHA.
     */
 
 if (!class_exists('Bozdoz_JPR_Plugin')) {
