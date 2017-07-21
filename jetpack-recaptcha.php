@@ -53,12 +53,12 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
             if (self::get_option('recaptcha_type', 'invisible')) {
                 // invisible script loaded before recaptcha
                 // calls script below internally
-                wp_enqueue_script(self::$prefix . 'invisible_recaptcha_script', plugins_url('assets/js/invisible-recaptcha.js', __FILE__), Array('jquery'), false, false);
+                wp_enqueue_script(self::$prefix . 'invisible_recaptcha_script');
+                wp_dequeue_script(self::$prefix . 'recaptcha_script');
             } else {
-                // enqueue the script
-                wp_enqueue_script(self::$prefix . 'recaptcha_script', 'https://www.google.com/recaptcha/api.js');
+                wp_enqueue_script(self::$prefix . 'recaptcha_script');
+                wp_dequeue_script(self::$prefix . 'invisible_recaptcha_script');
             }
-
             
             // append the button to the form shortcode
             $content = str_replace('[/contact-form]', '[bozdoz-jpr-button][/contact-form]', $content);
@@ -209,8 +209,7 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
                 'type' => 'select',
                 'options' => array(
                     'v2' => 'reCAPTCHA V2',
-                    'invisible' => 'Invisible reCAPTCHA',
-                    'android' => 'reCAPTCHA Android'
+                    'invisible' => 'Invisible reCAPTCHA'
                 ),
                 'helptext'=>'Which reCAPTCHA did you choose when you set it up with Google? More options coming soon!'
             )
@@ -271,10 +270,25 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
             /* add settings to plugin page */
             add_filter('plugin_action_links_' . plugin_basename(__FILE__), array($this, 'plugin_action_links'));
 
+            add_action('wp_enqueue_scripts', array($this, 'register_scripts'));
+
             /* add the real functionality to the plugin */
             add_filter('the_content', array($this, 'add_recaptcha'));
             add_shortcode('bozdoz-jpr-button', array($this, 'button_html'));
             add_filter('jetpack_contact_form_is_spam', array($this, 'google_verify'));
+        }
+
+        /*
+        *
+        * register_scripts
+        *
+        * registers scripts
+        * @return null
+        */
+
+        static function register_scripts () {
+            wp_register_script(self::$prefix . 'invisible_recaptcha_script', plugins_url('assets/js/invisible-recaptcha.js', __FILE__), Array('jquery'));
+            wp_register_script(self::$prefix . 'recaptcha_script', 'https://www.google.com/recaptcha/api.js');
         }
 
         /*
