@@ -7,8 +7,8 @@ Donate link: https://www.gittip.com/bozdoz/
 Tags: jetpack, google, recaptcha, captcha, contact
 Requires at least: 3.0.1
 Tested up to: 4.8
-Version: 0.1.0
-Stable tag: 0.1.0
+Version: 0.2.0
+Stable tag: 0.2.0
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -38,7 +38,13 @@ None yet! Shoot me a question about it on Twitter: [@bozdoz](https://www.twitter
 
 == Changelog ==
 
+= 0.2.0 =
+* Added invisible reCAPTCHA; fixes to plugin activation.
+
 = 0.1.0 =
 * First Version. Basic `[contact-form]` manipulation.
 
 == Upgrade Notice ==
+
+= 0.2.0 =
+Fixes to plugin activation.

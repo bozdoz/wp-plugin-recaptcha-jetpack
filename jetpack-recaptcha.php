@@ -5,7 +5,7 @@
     Description: A simple plugin that adds a Google reCAPTCHA to the Jetpack contact form. Requires the Jetpack plugin.
     Author: bozdoz
     Author URI: https://twitter.com/bozdoz/
-    Version: 0.1.0
+    Version: 0.2.0
     License: GPL2
 
     Jetpack reCAPTCHA is free software: you can redistribute it and/or modify
@@ -204,7 +204,7 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
                     'v2' => 'reCAPTCHA V2',
                     'invisible' => 'Invisible reCAPTCHA'
                 ),
-                'helptext'=>'Which reCAPTCHA did you choose when you set it up with Google? More options coming soon!'
+                'helptext'=>'Which reCAPTCHA did you choose when you set it up with Google? reCAPTCHA V2 is a visible animated checkbox, with optional challenges.  Invisible shows a small verification icon on the bottom right of the page and requires no user interaction.'
             )
         );
 
