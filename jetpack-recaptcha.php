@@ -50,7 +50,7 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
 
             if (!$matches) return $content;
 
-            if (self::get_option('recaptcha_type', 'v2') === 'invisible') {
+            if (self::get_option('recaptcha_type') === 'invisible') {
                 // calls script below internally
                 wp_enqueue_script(self::$prefix . 'invisible_recaptcha_script');
             } else {
@@ -73,14 +73,14 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
         */
 
         function button_html () {
-            $site_key = self::get_option('site_key', '');
+            $site_key = self::get_option('site_key');
 
             if (!$site_key) {
                 return sprintf('<div>No Site Key Found! Please Set this value in <a href="%s">Jetpack reCAPTCHA plugin!</a></div>', self::get_settings_url());
             }
 
             // get variable function name
-            $recaptcha_type = self::get_option('recaptcha_type', 'v2') . '_html';
+            $recaptcha_type = self::get_option('recaptcha_type') . '_html';
 
             // retrieve desired HTML for type
             $button = self::$recaptcha_type( $site_key );
@@ -137,11 +137,11 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
             $this->error = '';
 
             // invisible is done client-side (I believe)
-            if (self::get_option('recaptcha_type', 'invisible')) {
+            if (self::get_option('recaptcha_type') === 'invisible') {
                 return $default;
             }
 
-            $secret_key = self::get_option('secret_key', '');
+            $secret_key = self::get_option('secret_key');
 
             // if we can't make the request, return default
             if (!$secret_key ||
@@ -229,9 +229,9 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
         * @return varies
         */
 
-        private function get_option ($key, $default) {
+        private function get_option ($key) {
             $key = self::$prefix . $key;
-            return get_option($key, $default);
+            return get_option($key, self::$options[$key]['default']);
         }
 
         /*
