@@ -14,9 +14,9 @@
 
 		// add atts to submit button
 		$form.find('[type="submit"]')
-			.attr('class', 'g-recaptcha');
+			.attr('class', 'g-recaptcha')
 			.attr('data-sitekey', $this.data('sitekey'))
-			.attr('data-callback', 'bozdoz_jpr_onSubmit(this)')
+			.attr('data-callback', 'bozdoz_jpr_onSubmit(this)');
 	});
 
 	addScript('https://www.google.com/recaptcha/api.js');
