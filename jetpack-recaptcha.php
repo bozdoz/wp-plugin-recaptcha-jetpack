@@ -53,9 +53,10 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
             if (self::get_option('recaptcha_type') === 'invisible') {
                 // calls script below internally
                 wp_enqueue_script(self::$prefix . 'invisible_recaptcha_script');
-            } 
-            
-            wp_enqueue_script(self::$prefix . 'recaptcha_script');
+            } else {
+                wp_enqueue_script(self::$prefix . 'recaptcha_script');
+            }
+
             
             // append the button to the form shortcode
             $content = str_replace('[/contact-form]', '[bozdoz-jpr-button][/contact-form]', $content);
@@ -115,10 +116,9 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
         * @return string            html to insert into the form
         */
         private function invisible_html ($site_key) {
-            return sprintf("<div class=\"g-recaptcha invisible-recaptcha\" 
+            return sprintf("<div class=\"invisible-recaptcha\" 
                             data-sitekey=\"%s\"
                             data-callback=\"%s\"
-                            data-size=\"invisible\"
                             ></div>", $site_key, self::$prefix . 'onSubmit');
         }
 
