@@ -16,7 +16,7 @@
 		$form.find('[type="submit"]')
 			.attr('class', 'g-recaptcha')
 			.attr('data-sitekey', $this.data('sitekey'))
-			.attr('data-callback', 'bozdoz_jpr_onSubmit(this)');
+			.attr('data-callback', 'bozdoz_jpr_onSubmit');
 	});
 
 	addScript('https://www.google.com/recaptcha/api.js');
@@ -30,6 +30,8 @@
 	}
 
 	window.bozdoz_jpr_onSubmit = function (token) {
+		// add token to form?
+		debugger;
 		console.log(this, token);
 	};
 
