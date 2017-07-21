@@ -4,8 +4,6 @@
 	find recaptcha buttons and alter submit buttons to verify with recaptcha first
 
 	*/
-	var captcha_ready = $.Deferred();
-
 	$('.invisible-recaptcha').each(function () {
 		var $this = $(this),
 			$form = $this.closest('form.contact-form');
@@ -14,21 +12,25 @@
 		id = $form[0]['contact-form-id'].value;
 		submit_id = 'bozdoz_jpr_submit_' + id;
 
-		// add id to submit
+		// add atts to submit button
 		$form.find('[type="submit"]')
-			.attr('id', submit_id);
-
-		captcha_ready.done(function () {
-			grepcaptcha.render(submit_id, {
-				'sitekey' : $this.data('sitekey'),
-				'callback' : $form.submit,
-			})
-		});
+			.attr('class', 'g-recaptcha');
+			.attr('data-sitekey', $this.data('sitekey'))
+			.attr('data-callback', 'bozdoz_jpr_onSubmit(this)')
 	});
 
-	window.bozdoz_jpr_onLoad = function () {
-		captcha_ready.resolve();
-		console.log('onload fired');
+	addScript('https://www.google.com/recaptcha/api.js');
+
+	function addScript (src) {
+		var a = document.createElement('script'),
+			b = document.getElementsByTagName('script')[0];
+		a.async = 1;
+		a.src = src;
+		b.parentNode.insertBefore(a, b);
+	}
+
+	window.bozdoz_jpr_onSubmit = function (token) {
+		console.log(this, token);
 	};
 
 })(window.jQuery);

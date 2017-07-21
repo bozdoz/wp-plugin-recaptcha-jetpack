@@ -52,11 +52,13 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
 
             if (self::get_option('recaptcha_type', 'invisible')) {
                 // invisible script loaded before recaptcha
+                // calls script below internally
                 wp_enqueue_script(self::$prefix . 'invisible_recaptcha_script', plugins_url('assets/js/invisible-recaptcha.js', __FILE__), Array('jquery'), false, false);
+            } else {
+                // enqueue the script
+                wp_enqueue_script(self::$prefix . 'recaptcha_script', 'https://www.google.com/recaptcha/api.js');
             }
 
-            // enqueue the script
-            wp_enqueue_script(self::$prefix . 'recaptcha_script', 'https://www.google.com/recaptcha/api.js?onload=' . self::$prefix . 'onLoad&render=explicit');
             
             // append the button to the form shortcode
             $content = str_replace('[/contact-form]', '[bozdoz-jpr-button][/contact-form]', $content);
