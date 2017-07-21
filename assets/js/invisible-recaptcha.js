@@ -32,9 +32,7 @@
 	}
 
 	window.bozdoz_jpr_onSubmit = function (token) {
-		// add token to form?
 		// submit form for some reason
-		alert(token);
 		$form.submit();
 	};
 
