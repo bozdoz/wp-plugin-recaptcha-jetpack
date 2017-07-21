@@ -26,10 +26,15 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
     
     class Bozdoz_JPR_Plugin {
 
-        public static $title = 'Jetpack reCAPTCHA';
-        public static $slug = 'jetpack-recaptcha';
+        // generic variables for titles and URLs
+        static $title = 'Jetpack reCAPTCHA';
+        static $slug = 'jetpack-recaptcha';
+
+        // $prefix makes db entries and script/styles unique
+        static $prefix = 'bozdoz_jpr_';
+
         // $error holds an error msg if POST method fails
-        public static $error = '';
+        private $error = '';
 
         /*
         *
@@ -45,10 +50,15 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
 
             if (!$matches) return $content;
 
-            // prepend the script
-            wp_enqueue_script('jetpack_recaptcha_script', 'https://www.google.com/recaptcha/api.js');
+            if (self::get_option('recaptcha_type', 'invisible')) {
+                // invisible script loaded before recaptcha
+                wp_enqueue_script(self::$prefix . 'invisible_recaptcha_script', plugins_url('assets/js/invisible-recaptcha.js', __FILE__), Array('jquery'), false, false);
+            }
+
+            // enqueue the script
+            wp_enqueue_script(self::$prefix . 'recaptcha_script', 'https://www.google.com/recaptcha/api.js?onload=' . self::$prefix . 'onLoad');
             
-            // add the button
+            // append the button to the form shortcode
             $content = str_replace('[/contact-form]', '[bozdoz-jpr-button][/contact-form]', $content);
 
             return $content;
@@ -64,19 +74,53 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
         */
 
         function button_html () {
-            $site_key = get_option('bozdoz_jpr_site_key', '');
+            $site_key = self::get_option('site_key', '');
 
             if (!$site_key) {
-                return '<div>No Site Key Found! Please Set this value in Jetpack reCAPTCHA plugin!</div>';
+                return sprintf('<div>No Site Key Found! Please Set this value in <a href="%s">Jetpack reCAPTCHA plugin!</a></div>', self::get_settings_url());
             }
 
-            $button = sprintf("<div class=\"g-recaptcha\" data-sitekey=\"%s\"></div>", $site_key);
+            // get variable function name
+            $recaptcha_type = self::get_option('recaptcha_type', 'v2') . '_html';
 
-            if (self::$error) {
-                return sprintf("<div class=\"error\">%s</div> %s", self::$error, $button);
+            // retrieve desired HTML for type
+            $button = self::$recaptcha_type( $site_key );
+
+            if ($this->error) {
+                return sprintf("<div class=\"error\">%s</div> %s", $this->error, $button);
             }
 
             return $button;
+        }
+
+        /*
+        *
+        * v2_html
+        *
+        * Adds html to the Jetpack contact form
+        *
+        * @param string $site_key   site key from db/Google
+        * @return string            html to insert into the form
+        */
+        private function v2_html ($site_key) {
+            return sprintf("<div class=\"g-recaptcha\" data-sitekey=\"%s\"></div>", $site_key);
+        }
+
+        /*
+        *
+        * invisible_html
+        *
+        * Adds html to the Jetpack contact form
+        *
+        * @param string $site_key   site key from db/Google
+        * @return string            html to insert into the form
+        */
+        private function invisible_html ($site_key) {
+            return sprintf("<div class=\"invisible-recaptcha\" 
+                            data-sitekey=\"%s\"
+                            data-callback=\"%s\"
+                            data-size=\"invisible\"
+                            ></div>", $site_key, self::$prefix . 'onSubmit');
         }
 
         /*
@@ -91,9 +135,9 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
 
         function google_verify ($default) {
             // reset error
-            self::$error = '';
+            $this->error = '';
 
-            $secret_key = get_option('bozdoz_jpr_secret_key');
+            $secret_key = self::get_option('secret_key', '');
 
             // if we can't make the request, return default
             if (!$secret_key ||
@@ -107,8 +151,8 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
             $response = json_decode($response);
 
             if (!$response->success) {
-                self::$error = 'Google could not verify you; please try again.';
-                return new WP_Error('spam', self::$error);
+                $this->error = 'Google could not verify you; please try again.';
+                return new WP_Error('spam', $this->error);
             }
 
             return $default;
@@ -125,7 +169,7 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
         * @return varies
         */
 
-        public function get_url($url, $querystring) {
+        static function get_url($url, $querystring) {
             $ch = curl_init();
 
             curl_setopt($ch, CURLOPT_AUTOREFERER, TRUE);
@@ -142,6 +186,70 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
             return $data;
         }
 
+        static $options = array(
+            'site_key' => array(
+                'default'=>'',
+                'type'=>'text',
+                'helptext'=>'Your Site Key. Get yours here: <a href="https://www.google.com/recaptcha/" target="_blank">Google reCAPTCHA</a>.'
+            ),
+            'secret_key' => array(
+                'default'=>'',
+                'type'=>'text',
+                'helptext'=>'Your Secret Key. Get yours here: <a href="https://www.google.com/recaptcha/" target="_blank">Google reCAPTCHA</a>.'
+            ),
+            'recaptcha_type' => array(
+                'default'=>'v2',
+                'type' => 'select',
+                'options' => array(
+                    'v2' => 'reCAPTCHA V2',
+                    'invisible' => 'Invisible reCAPTCHA',
+                    'android' => 'reCAPTCHA Android'
+                ),
+                'helptext'=>'Which reCAPTCHA did you choose when you set it up with Google? More options coming soon!'
+            )
+        );
+
+        /*
+    
+        Helper functions
+
+        */
+
+        /*
+        *
+        * get_option
+        *
+        * wrapper for WordPress get_options (adds prefix to default options)
+        *
+        * @param string $key                
+        * @param varies $default   default value if not found in db
+        * @return varies
+        */
+
+        private function get_option ($key, $default) {
+            $key = self::$prefix . $key;
+            return get_option($key, $default);
+        }
+
+        /*
+        *
+        * foreachoption
+        *
+        * useful for iterating db options above
+        *
+        * @param function $method   the method executed on the array name and default value (ex: add_option)
+        * @return null
+        */
+
+        static function foreachoption ( $method ) {
+            foreach(self::$options as $name=>$atts) {
+                // prevent "plugin generated XX characters" error
+                if (isset($atts['default'])) {
+                    $method(self::$prefix . $name, $atts['default']);
+                }
+            }
+        }
+
         /*
         *
         * ADMIN STUFF (pages, db options)
@@ -156,91 +264,51 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
             /* add settings to plugin page */
             add_filter('plugin_action_links_' . plugin_basename(__FILE__), array($this, 'plugin_action_links'));
 
-            // look for [contact-form] in the post content
+            /* add the real functionality to the plugin */
             add_filter('the_content', array($this, 'add_recaptcha'));
-            // add the button to the form
             add_shortcode('bozdoz-jpr-button', array($this, 'button_html'));
             add_filter('jetpack_contact_form_is_spam', array($this, 'google_verify'));
         }
 
-        public static $options = array(
-            'bozdoz_jpr_site_key' => array(
-                'default'=>'',
-                'type'=>'text',
-                'helptext'=>'Your Site Key. Get yours here: <a href="https://www.google.com/recaptcha/" target="_blank">Google reCAPTCHA</a>.'
-            ),
-            'bozdoz_jpr_secret_key' => array(
-                'default'=>'',
-                'type'=>'text',
-                'helptext'=>'Your Secret Key. Get yours here: <a href="https://www.google.com/recaptcha/" target="_blank">Google reCAPTCHA</a>.'
-            ),
-            'bozdoz_jpr_recaptcha_type' => array(
-                'default'=>'v2',
-                'type' => 'select',
-                'options' => array(
-                    'v2' => 'reCAPTCHA V2',
-                    /*'invisible' => 'Invisible reCAPTCHA',
-                    'android' => 'reCAPTCHA Android'*/
-                ),
-                'helptext'=>'Which reCAPTCHA did you choose when you set it up with Google? More options coming soon!'
-            ),
-        );
-
         /*
         *
-        * foreachoption
-        *
-        * useful for iterating db options above
-        *
-        * @param function $method   the method executed on the array name and default value (ex: add_option)
-        * @return null
-        */
-
-        public function foreachoption ( $method ) {
-            foreach(self::$options as $name=>$atts) {
-                $method($name, $atts['default']);
-            }
-        }
-
-        /*
-        *
-        * bozdoz_jpr_activation
+        * activate
         *
         * adds the default values to the db
         * @return null
         */
 
-        public function activation () {
-            self::foreachoption( add_option );
+        static function activate () {
+            self::foreachoption( 'add_option' );
         }
 
         /*
         *
-        * bozdoz_jpr_uninstall
+        * uninstall
         *
         * adds the default values to the db
         * @return null
         */
 
-        public function uninstall () {
-            self::foreachoption( delete_option );
+        static function uninstall () {
+            self::foreachoption( 'delete_option' );
         }
 
         /*
         *
-        * bozdoz_jpr_admin_init
+        * admin_init
         *
         * registers the style for the admin page
         * @return null
         */
         
         public function admin_init () {
-            wp_register_style('bozdoz_jpr_admin_style', plugins_url('admin/style.css', __FILE__));
+            wp_register_style(self::$prefix . 'admin_style', plugins_url('admin/style.css', __FILE__));
         }
 
         /*
         *
-        * bozdoz_jpr_admin_menu
+        * admin_menu
         *
         * adds the admin page link to the admin menu
         * @return null
@@ -253,8 +321,9 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
         public function settings_page () {
             $defaults = self::$options;
             $plugin_title = self::$title;
+            $prefix = self::$prefix;
 
-            wp_enqueue_style( 'bozdoz_jpr_admin_style' );
+            wp_enqueue_style($prefix . 'admin_style');
 
             include 'admin/admin.php';
         }
@@ -267,13 +336,25 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
         * @return array $links  manipulated array of links 
         */
         public function plugin_action_links ( $links ) {
-            $links[] = '<a href="'. esc_url( get_admin_url(null, 'options-general.php?page=' . self::$slug) ) .'">Settings</a>';
+            $links[] = sprintf('<a href="%s">Settings</a>', self::get_settings_url());
             return $links;
         }
+
+        /*
+        *
+        * Get settings link
+        *
+        * @return string    link to admin settings page
+        */
+        public function get_settings_url () {
+            return esc_url( get_admin_url(null, 'options-general.php?page=' . self::$slug) );
+        }
+
+
     }
 
-    register_activation_hook( __FILE__, array('Bozdoz_JPR_Plugin', 'activate'));
-    register_uninstall_hook( __FILE__, array('Bozdoz_JPR_Plugin', 'uninstall') );
+    register_activation_hook(__FILE__, array('Bozdoz_JPR_Plugin', 'activate'));
+    register_uninstall_hook(__FILE__, array('Bozdoz_JPR_Plugin', 'uninstall'));
 
     new Bozdoz_JPR_Plugin();
 }

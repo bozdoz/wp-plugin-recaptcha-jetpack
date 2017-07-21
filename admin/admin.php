@@ -10,7 +10,7 @@ if (isset($_POST['submit'])) {
 		if ($type === 'checkbox') {
 			$form[$name] = isset($_POST[$name]) ? 1 : 0;
 		}
-		update_option($name, stripslashes( $form[$name]) );
+		update_option($prefix . $name, stripslashes( $form[$name]) );
 	}
 ?>
 <div class="updated">
@@ -20,7 +20,7 @@ if (isset($_POST['submit'])) {
 } elseif (isset($_POST['reset'])) {
 	foreach ($defaults as $name=>$atts) {
 		if (isset($atts['default']) && !isset($atts['noreset'])) {
-			update_option($name, $atts['default']);
+			update_option($prefix . $name, $atts['default']);
 		}
 	}
 ?>
@@ -38,10 +38,6 @@ if (isset($_POST['submit'])) {
 	<?php
 	function option_label ($opt) {
 	    $opt = explode('_', $opt);
-
-	    // remove both prefixes
-	    array_shift($opt);
-	    array_shift($opt);
 	    
 	    foreach($opt as &$v) {
 	        $v = ucfirst($v);
@@ -65,7 +61,7 @@ if (isset($_POST['submit'])) {
                 <?php
                 foreach ($atts['options'] as $o => $n) {
                 ?>
-                    <option value="<?php echo $o; ?>"<?php if (get_option($name) == $o) echo ' selected' ?>>
+                    <option value="<?php echo $o; ?>"<?php if (get_option($prefix . $name) == $o) echo ' selected' ?>>
                     	<?php echo $n; ?>
                    	</option>
                 <?php
@@ -80,7 +76,7 @@ if (isset($_POST['submit'])) {
 					name="<?php echo $name; ?>" 
 					type="text" 
 					id="<?php echo $name; ?>" 
-					value="<?php echo htmlspecialchars( get_option($name, $atts['default']) ); ?>" 
+					value="<?php echo htmlspecialchars( get_option($prefix . $name, $atts['default']) ); ?>" 
 					/>
 			<?php
 			} elseif ($type === 'textarea') {
@@ -88,7 +84,7 @@ if (isset($_POST['submit'])) {
 				<textarea 
 					id="<?php echo $name; ?>"
 					class="full-width" 
-					name="<?php echo $name; ?>"><?php echo htmlspecialchars( get_option($name, $atts['default']) ); ?></textarea>
+					name="<?php echo $name; ?>"><?php echo htmlspecialchars( get_option($prefix . $name, $atts['default']) ); ?></textarea>
 			<?php
 			} elseif ($type === 'checkbox') {
 			?>
@@ -97,7 +93,7 @@ if (isset($_POST['submit'])) {
 					name="<?php echo $name; ?>" 
 					type="checkbox" 
 					id="<?php echo $name; ?>"
-					<?php if (get_option($name, $atts['default'])) echo ' checked="checked"' ?> 
+					<?php if (get_option($prefix . $name, $atts['default'])) echo ' checked="checked"' ?> 
 					/>
 			<?php
 			}
