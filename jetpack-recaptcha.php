@@ -50,14 +50,11 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
 
             if (!$matches) return $content;
 
-            if (self::get_option('recaptcha_type', 'invisible')) {
-                // invisible script loaded before recaptcha
+            if (self::get_option('recaptcha_type', 'v2') === 'invisible') {
                 // calls script below internally
                 wp_enqueue_script(self::$prefix . 'invisible_recaptcha_script');
-                wp_dequeue_script(self::$prefix . 'recaptcha_script');
             } else {
                 wp_enqueue_script(self::$prefix . 'recaptcha_script');
-                wp_dequeue_script(self::$prefix . 'invisible_recaptcha_script');
             }
             
             // append the button to the form shortcode
