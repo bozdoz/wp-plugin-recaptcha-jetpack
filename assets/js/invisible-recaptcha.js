@@ -8,9 +8,7 @@
 
 	$('.invisible-recaptcha').each(function () {
 		var $this = $(this),
-			$form = $this.closest('form.contact-form'),
-			id,
-			submit_id;
+			$form = $this.closest('form.contact-form');
 		if (!$form.length) return;
 		// get id
 		id = $form[0]['contact-form-id'].value;
