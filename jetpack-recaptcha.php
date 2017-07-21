@@ -141,8 +141,7 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
             $secret_key = self::get_option('secret_key');
 
             // if we can't make the request, return default
-            if (!$secret_key ||
-                !isset($_POST['g-recaptcha-response'])) {
+            if (!$secret_key) {
                 return $default;
             } 
 
