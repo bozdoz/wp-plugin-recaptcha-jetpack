@@ -139,6 +139,11 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
             // reset error
             $this->error = '';
 
+            // invisible is done client-side (I believe)
+            if (self::get_option('recaptcha_type', 'invisible')) {
+                return $default;
+            }
+
             $secret_key = self::get_option('secret_key', '');
 
             // if we can't make the request, return default
