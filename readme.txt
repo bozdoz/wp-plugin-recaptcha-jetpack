@@ -7,8 +7,8 @@ Donate link: https://www.gittip.com/bozdoz/
 Tags: jetpack, google, recaptcha, captcha, contact
 Requires at least: 3.0.1
 Tested up to: 4.8
-Version: 0.2.1
-Stable tag: 0.2.1
+Version: 0.2.2
+Stable tag: 0.2.2
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -37,6 +37,9 @@ None yet! Shoot me a question about it on Twitter: [@bozdoz](https://www.twitter
 == Screenshots ==
 
 == Changelog ==
+
+= 0.2.2 =
+* Added additional `isset` checks to fix undefined index errors.
 
 = 0.2.1 =
 * Renamed plugin to reCAPTCHA Jetpack; added minor Google response validation and nonce verification.

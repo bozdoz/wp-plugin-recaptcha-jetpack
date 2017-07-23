@@ -5,7 +5,7 @@
     Description: A simple plugin that adds a Google reCAPTCHA to the Jetpack contact form. Requires the Jetpack plugin.
     Author: bozdoz
     Author URI: https://twitter.com/bozdoz/
-    Version: 0.2.1
+    Version: 0.2.2
     License: GPL2
 
     reCAPTCHA Jetpack is free software: you can redistribute it and/or modify
@@ -258,7 +258,9 @@ if (!class_exists('Bozdoz_RJP_Plugin')) {
 
         private function get_option ($key) {
             $key = self::$prefix . $key;
-            return get_option($key, self::$options[$key]['default']);
+            $option = isset(self::$options[$key]) ? self::$options[$key] : array();
+            $default = isset($option['default']) ? $option['default'] : false;
+            return get_option($key, $default);
         }
 
         /*
