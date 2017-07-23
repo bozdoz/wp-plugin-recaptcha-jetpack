@@ -4,21 +4,16 @@
 	find recaptcha buttons and alter submit buttons to verify with recaptcha first
 
 	*/
-	var $form;
-
-	$('.invisible-recaptcha').eq(0).each(function () {
-		var $this = $(this);
-
+	var $this = $('.invisible-recaptcha').eq(0),
 		$form = $this.closest('form.contact-form');
 
-		if (!$form.length) return;
+	if (!$form.length) return;
 
-		// add atts to button
-		$form.find('[type="submit"]')
-			.attr('data-sitekey', $this.data('sitekey'))
-			.attr('data-callback', $this.data('callback'))
-			.addClass('g-recaptcha');
-	});
+	// add atts to button
+	$form.find('[type="submit"]')
+		.attr('data-sitekey', $this.data('sitekey'))
+		.attr('data-callback', 'bozdoz_rjp_onSubmit')
+		.addClass('g-recaptcha');
 
 	addScript('https://www.google.com/recaptcha/api.js');
 
@@ -31,7 +26,8 @@
 		b.parentNode.insertBefore(a, b);
 	}
 
-	window.bozdoz_jpr_onSubmit = function (token) {
+	// needs to be global to be triggered by Google's callback (above)
+	window.bozdoz_rjp_onSubmit = function (token) {
 		// submit form for some reason
 		$form.submit();
 	};

@@ -1,39 +1,39 @@
 <?php
     /*
-    Plugin Name: Jetpack reCAPTCHA
-    Plugin URI: https://github.com/bozdoz/wp-plugin-jetpack-recaptcha
+    Plugin Name: reCAPTCHA Jetpack
+    Plugin URI: https://github.com/bozdoz/wp-plugin-recaptcha-jetpack
     Description: A simple plugin that adds a Google reCAPTCHA to the Jetpack contact form. Requires the Jetpack plugin.
     Author: bozdoz
     Author URI: https://twitter.com/bozdoz/
-    Version: 0.2.0
+    Version: 0.2.1
     License: GPL2
 
-    Jetpack reCAPTCHA is free software: you can redistribute it and/or modify
+    reCAPTCHA Jetpack is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 2 of the License, or
     any later version.
      
-    Jetpack reCAPTCHA is distributed in the hope that it will be useful,
+    reCAPTCHA Jetpack is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
      
     You should have received a copy of the GNU General Public License
-    along with Jetpack reCAPTCHA.
+    along with reCAPTCHA Jetpack.
     */
 
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
-if (!class_exists('Bozdoz_JPR_Plugin')) {
+if (!class_exists('Bozdoz_RJP_Plugin')) {
     
-    class Bozdoz_JPR_Plugin {
+    class Bozdoz_RJP_Plugin {
 
         // generic variables for titles and URLs
-        static $title = 'Jetpack reCAPTCHA';
-        static $slug = 'jetpack-recaptcha';
+        static $title = 'reCAPTCHA Jetpack';
+        static $slug = 'recaptcha-jetpack';
 
         // $prefix makes db entries and script/styles unique
-        static $prefix = 'bozdoz_jpr_';
+        static $prefix = 'bozdoz_rjp_';
 
         // $error holds an error msg if POST method fails
         private $error = '';
@@ -61,7 +61,7 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
 
             
             // append the button to the form shortcode
-            $content = str_replace('[/contact-form]', '[bozdoz-jpr-button][/contact-form]', $content);
+            $content = str_replace('[/contact-form]', '[' . self::$prefix . '-button][/contact-form]', $content);
 
             return $content;
         }
@@ -79,7 +79,7 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
             $site_key = self::get_option('site_key');
 
             if (!$site_key) {
-                return sprintf('<div>No Site Key Found! Please Set this value in <a href="%s">Jetpack reCAPTCHA plugin!</a></div>', self::get_settings_url());
+                return sprintf('<div>No Site Key Found! Please Set this value in <a href="%s">reCAPTCHA Jetpack plugin!</a></div>', self::get_settings_url());
             }
 
             // get variable function name
@@ -123,17 +123,20 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
         private function invisible_html ($site_key) {
             return sprintf("<div class=\"invisible-recaptcha\" 
                             data-sitekey=\"%s\"
-                            data-callback=\"%s\"
-                            ></div>", $site_key, self::$prefix . 'onSubmit');
+                            ></div>", $site_key);
         }
 
         /*
         *
         * google_verify
         *
-        * set up the request to google to test form for spam
+        * set up the request to google to test form for spam;
+        * typically it won't send back a true value if it fails;
+        * it will at best attempt to verify with Google, and 
+        * return a WP_Error, which forces Jetpack to exit the 
+        * email function
         *
-        * @param string $default    whether the form is spam (seems strange)
+        * @param string $default    whether the form is spam
         * @return boolean           true if spam, else default
         */
 
@@ -141,6 +144,14 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
             // reset error
             $this->error = '';
 
+            $secret_key = self::get_option('secret_key');
+
+            // if we can't make the request, return default
+            if (!$secret_key) {
+                return $default;
+            }
+
+            // verify nonce
             $site_key = self::get_option('site_key');
             $nonce_action = 'recaptcha_' . $site_key;
 
@@ -152,33 +163,29 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
                 return true;
             }
 
-            $secret_key = self::get_option('secret_key');
+            // filter response
+            $response = (object) array();
+            $recaptcha_reponse = isset($_POST['g-recaptcha-response']) ? $_POST['g-recaptcha-response'] : '';
 
-            // if we can't make the request, return default
-            if (!$secret_key) {
-                return $default;
+            // mostly unnecessary filter to verify that it's a string
+            // although there is virtually no way that it isn't a string
+            $recaptcha_reponse = sanitize_text_field($recaptcha_reponse);
+
+            if ($recaptcha_reponse) {
+                // try to verify with Google
+                $url = 'https://www.google.com/recaptcha/api/siteverify';
+                $querystring = sprintf('secret=%s&response=%s', $secret_key, $recaptcha_reponse);
+                $response = self::get_url($url, $querystring);
+                $response = json_decode($response);
             }
-
-            // if Google has attached a response
-            if (!isset($_POST['g-recaptcha-response'])) {
-                // possible spam
-                return true;
-            }
-
-            echo $_POST['g-recaptcha-response'];
-            exit();
-
-            // try to verify with Google
-            $url = 'https://www.google.com/recaptcha/api/siteverify';
-            $querystring = sprintf('secret=%s&response=%s', $secret_key, $_POST['g-recaptcha-response']);
-            $response = self::get_url($url, $querystring);
-            $response = json_decode($response);
 
             if (!$response->success) {
+                // either there was no g-recaptcha-response or Google responded without success
                 $this->error = 'Google could not verify you; please try again.';
                 return new WP_Error('spam', $this->error);
             }
 
+            // pass back the default boolean
             return $default;
         }
 
@@ -291,7 +298,7 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
 
             /* add the real functionality to the plugin */
             add_filter('the_content', array($this, 'add_recaptcha'));
-            add_shortcode('bozdoz-jpr-button', array($this, 'button_html'));
+            add_shortcode(self::$prefix . '-button', array($this, 'button_html'));
             add_filter('jetpack_contact_form_is_spam', array($this, 'google_verify'));
         }
 
@@ -391,8 +398,8 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
 
     }
 
-    register_activation_hook(__FILE__, array('Bozdoz_JPR_Plugin', 'activate'));
-    register_uninstall_hook(__FILE__, array('Bozdoz_JPR_Plugin', 'uninstall'));
+    register_activation_hook(__FILE__, array('Bozdoz_RJP_Plugin', 'activate'));
+    register_uninstall_hook(__FILE__, array('Bozdoz_RJP_Plugin', 'uninstall'));
 
-    new Bozdoz_JPR_Plugin();
+    new Bozdoz_RJP_Plugin();
 }

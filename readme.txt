@@ -1,14 +1,14 @@
-=== Jetpack reCAPTCHA ===
+=== reCAPTCHA Jetpack ===
 Author: bozdoz
 Author URI: https://www.twitter.com/bozdoz/
-Plugin URI: https://github.com/bozdoz/wp-plugin-jetpack-recaptcha
+Plugin URI: https://github.com/bozdoz/wp-plugin-recaptcha-jetpack
 Contributors: bozdoz
 Donate link: https://www.gittip.com/bozdoz/
 Tags: jetpack, google, recaptcha, captcha, contact
 Requires at least: 3.0.1
 Tested up to: 4.8
-Version: 0.2.0
-Stable tag: 0.2.0
+Version: 0.2.1
+Stable tag: 0.2.1
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -27,7 +27,7 @@ Shoot me a question about it on Twitter: [@bozdoz](https://www.twitter.com/bozdo
 **OR**
 
 1. Choose to add a new plugin, then click upload
-2. Upload the jetpack-recaptcha zip
+2. Upload the recaptcha-jetpack zip
 3. Activate the plugin through the 'Plugins' menu in WordPress
 
 == Frequently Asked Questions ==
@@ -37,6 +37,9 @@ None yet! Shoot me a question about it on Twitter: [@bozdoz](https://www.twitter
 == Screenshots ==
 
 == Changelog ==
+
+= 0.2.1 =
+* Renamed plugin to reCAPTCHA Jetpack; added minor Google response validation and nonce verification.
 
 = 0.2.0 =
 * Added invisible reCAPTCHA; fixes to plugin activation.

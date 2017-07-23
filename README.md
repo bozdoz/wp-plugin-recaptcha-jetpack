@@ -1,4 +1,4 @@
-# Jetpack reCAPTCHA
+# reCAPTCHA Jetpack
 
 ![WordPress](https://img.shields.io/badge/wordpress-4.8-green.svg?style=flat)
 
