@@ -22,6 +22,8 @@
     along with Jetpack reCAPTCHA.
     */
 
+if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
+
 if (!class_exists('Bozdoz_JPR_Plugin')) {
     
     class Bozdoz_JPR_Plugin {
@@ -86,6 +88,9 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
             // retrieve desired HTML for type
             $button = self::$recaptcha_type( $site_key );
 
+            // add nonce
+            $button .= wp_nonce_field('recaptcha_' . $site_key, 'recaptcha_nonce', true, false);
+
             if ($this->error) {
                 return sprintf("<div class=\"error\">%s</div> %s", $this->error, $button);
             }
@@ -136,15 +141,34 @@ if (!class_exists('Bozdoz_JPR_Plugin')) {
             // reset error
             $this->error = '';
 
-            // invisible is done client-side (I believe)
+            $site_key = self::get_option('site_key');
+            $nonce_action = 'recaptcha_' . $site_key;
+
+            $nonce = isset($_POST['recaptcha_nonce']) ? $_POST['recaptcha_nonce'] : '';
+
+            if (!$nonce ||
+                !wp_verify_nonce($nonce, $nonce_action)) {
+                // possible spam
+                return true;
+            }
 
             $secret_key = self::get_option('secret_key');
 
             // if we can't make the request, return default
             if (!$secret_key) {
                 return $default;
-            } 
+            }
 
+            // if Google has attached a response
+            if (!isset($_POST['g-recaptcha-response'])) {
+                // possible spam
+                return true;
+            }
+
+            echo $_POST['g-recaptcha-response'];
+            exit();
+
+            // try to verify with Google
             $url = 'https://www.google.com/recaptcha/api/siteverify';
             $querystring = sprintf('secret=%s&response=%s', $secret_key, $_POST['g-recaptcha-response']);
             $response = self::get_url($url, $querystring);
