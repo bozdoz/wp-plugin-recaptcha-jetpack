@@ -4,4 +4,4 @@
 
 Google reCAPTCHA add-on for the Jetpack Plugin. Requires Jetpack.
 
-![reCAPTCHA Jetpack](https://ps.w.org/recaptcha-jetpack/assets/banner-772x250.png?rev=1702071)
+![reCAPTCHA Jetpack](https://ps.w.org/recaptcha-jetpack/assets/banner-1544x500.png?rev=1702071)
