@@ -1,9 +1,9 @@
 === reCAPTCHA Jetpack ===
 Author: bozdoz
 Author URI: https://www.twitter.com/bozdoz/
-Plugin URI: https://github.com/bozdoz/wp-plugin-recaptcha-jetpack
+Plugin URI: https://wordpress.org/plugins/recaptcha-jetpack/
 Contributors: bozdoz
-Donate link: https://www.gittip.com/bozdoz/
+Donate link: https://www.paypal.me/bozdoz
 Tags: jetpack, google, recaptcha, captcha, contact
 Requires at least: 3.0.1
 Tested up to: 4.8
@@ -18,7 +18,11 @@ A simple plugin that adds a Google reCAPTCHA to the Jetpack contact form. Requir
 
 [Jetpack](https://wordpress.org/plugins/jetpack/) makes it easy to add contact forms to your WordPress site, but you may want a simple way to add a [Google reCAPTCHA](https://www.google.com/recaptcha/) to prevent spam.  This plugin will manipulate the Jetpack `[contact-form]` shortcode to prepend the Google script, add a button, and parse the response.
 
+This plugin allows both reCAPTCHA v2 and invisible reCAPTCHA (see screenshots and choose whatever works for you!).
+
 Shoot me a question about it on Twitter: [@bozdoz](https://www.twitter.com/bozdoz/).
+
+This plugin is open source on [GitHub](https://github.com/bozdoz/wp-plugin-recaptcha-jetpack)!
 
 == Installation ==
 
@@ -35,6 +39,10 @@ Shoot me a question about it on Twitter: [@bozdoz](https://www.twitter.com/bozdo
 None yet! Shoot me a question about it on Twitter: [@bozdoz](https://www.twitter.com/bozdoz/).
 
 == Screenshots ==
+
+1. Register with [Google reCAPTCHA](https://www.google.com/recaptcha/) and fill in your site key, and secret key (also, choose which kind of reCAPTCHA; see other screenshots for examples)
+2. Example Jetpack form with reCAPTCHA v2.
+3. Example Jetpack form with invisible reCAPTCHA.
 
 == Changelog ==
 
