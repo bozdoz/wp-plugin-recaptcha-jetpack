@@ -6,7 +6,7 @@ Contributors: bozdoz
 Donate link: https://www.paypal.me/bozdoz
 Tags: jetpack, google, recaptcha, captcha, contact
 Requires at least: 3.0.1
-Tested up to: 4.8
+Tested up to: 4.9
 Version: 0.2.2
 Stable tag: 0.2.2
 License: GPLv2
