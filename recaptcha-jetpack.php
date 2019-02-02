@@ -12,12 +12,12 @@
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 2 of the License, or
     any later version.
-     
+
     reCAPTCHA Jetpack is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
-     
+
     You should have received a copy of the GNU General Public License
     along with reCAPTCHA Jetpack.
     */
@@ -25,7 +25,7 @@
 if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 if (!class_exists('Bozdoz_RJP_Plugin')) {
-    
+
     class Bozdoz_RJP_Plugin {
 
         // generic variables for titles and URLs
@@ -59,7 +59,7 @@ if (!class_exists('Bozdoz_RJP_Plugin')) {
                 wp_enqueue_script(self::$prefix . 'recaptcha_script');
             }
 
-            
+
             // append the button to the form shortcode
             $content = str_replace('[/contact-form]', '[' . self::$prefix . '-button][/contact-form]', $content);
 
@@ -121,7 +121,7 @@ if (!class_exists('Bozdoz_RJP_Plugin')) {
         * @return string            html to insert into the form
         */
         private function invisible_html ($site_key) {
-            return sprintf("<div class=\"invisible-recaptcha\" 
+            return sprintf("<div class=\"invisible-recaptcha\"
                             data-sitekey=\"%s\"
                             ></div>", $site_key);
         }
@@ -132,8 +132,8 @@ if (!class_exists('Bozdoz_RJP_Plugin')) {
         *
         * set up the request to google to test form for spam;
         * typically it won't send back a true value if it fails;
-        * it will at best attempt to verify with Google, and 
-        * return a WP_Error, which forces Jetpack to exit the 
+        * it will at best attempt to verify with Google, and
+        * return a WP_Error, which forces Jetpack to exit the
         * email function
         *
         * @param string $default    whether the form is spam
@@ -171,7 +171,7 @@ if (!class_exists('Bozdoz_RJP_Plugin')) {
             // although there is virtually no way that it isn't a string
             $recaptcha_reponse = sanitize_text_field($recaptcha_reponse);
 
-            if ($recaptcha_reponse) {
+            if (!empty($recaptcha_reponse)) {
                 // try to verify with Google
                 $url = 'https://www.google.com/recaptcha/api/siteverify';
                 $querystring = sprintf('secret=%s&response=%s', $secret_key, $recaptcha_reponse);
@@ -179,7 +179,7 @@ if (!class_exists('Bozdoz_RJP_Plugin')) {
                 $response = json_decode($response);
             }
 
-            if (!$response->success) {
+            if (!property_exists($response, 'success')) {
                 // either there was no g-recaptcha-response or Google responded without success
                 $this->error = 'Google could not verify you; please try again.';
                 return new WP_Error('spam', $this->error);
@@ -240,7 +240,7 @@ if (!class_exists('Bozdoz_RJP_Plugin')) {
         );
 
         /*
-    
+
         Helper functions
 
         */
@@ -251,7 +251,7 @@ if (!class_exists('Bozdoz_RJP_Plugin')) {
         *
         * wrapper for WordPress get_options (adds prefix to default options)
         *
-        * @param string $key                
+        * @param string $key
         * @param varies $default   default value if not found in db
         * @return varies
         */
@@ -292,7 +292,7 @@ if (!class_exists('Bozdoz_RJP_Plugin')) {
             /* admin hooks */
             add_action('admin_init', array($this, 'admin_init'));
             add_action('admin_menu', array($this, 'admin_menu'));
-            
+
             /* add settings to plugin page */
             add_filter('plugin_action_links_' . plugin_basename(__FILE__), array($this, 'plugin_action_links'));
 
@@ -348,7 +348,7 @@ if (!class_exists('Bozdoz_RJP_Plugin')) {
         * registers the style for the admin page
         * @return null
         */
-        
+
         public function admin_init () {
             wp_register_style(self::$prefix . 'admin_style', plugins_url('admin/style.css', __FILE__));
         }
@@ -380,7 +380,7 @@ if (!class_exists('Bozdoz_RJP_Plugin')) {
         * Add settings link to the plugin on Installed Plugins page
         *
         * @param array $links   array of links on plugin page
-        * @return array $links  manipulated array of links 
+        * @return array $links  manipulated array of links
         */
         public function plugin_action_links ( $links ) {
             $links[] = sprintf('<a href="%s">Settings</a>', self::get_settings_url());
